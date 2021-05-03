@@ -1,0 +1,32 @@
+{
+  "name": "chrome-windows-manage",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/liu-lihao/chrome-windows-manage.git",
+  "author": "Vito Liu <vitoliu@xiaoman.cn>",
+  "license": "MIT",
+  "type": "module",
+  "dependencies": {
+    "esbuild": "^0.11.16",
+    "loadsh": "^0.0.4",
+    "lodash": "^4.17.21",
+    "vue": "3.0.11"
+  },
+  "scripts": {
+    "dev": "node ./config/dev-build",
+    "build": "node ./config/prod-build",
+    "style": "prettier --ignore-path .gitignore --write ./"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.136",
+    "@types/fs-extra": "^9.0.11",
+    "@types/lodash": "^4.14.168",
+    "@types/node": "^15.0.1",
+    "@vue/compiler-sfc": "^3.0.11",
+    "esbuild-plugin-sass": "^0.5.0",
+    "esbuild-plugin-vue": "^0.1.2",
+    "fs-extra": "^9.1.0",
+    "prettier": "^2.2.1",
+    "watchr": "^6.9.0"
+  }
+}
