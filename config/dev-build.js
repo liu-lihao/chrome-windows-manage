@@ -7,9 +7,15 @@ const WATCH_IGNORE_PATHS = ['/node_modules', '/dist']
 const stalker = watchr.create(projectDir)
 const { safeBuild } = esBuildProject()
 
+const devBuild = () =>
+  safeBuild({
+    minify: true,
+    sourcemap: false
+  })
+
 // changeType, fullPath, currentStat, previousStat
 stalker.on('change', () => {
-  safeBuild()
+  devBuild()
 })
 
 stalker.setConfig({
@@ -28,8 +34,5 @@ stalker.setConfig({
 stalker.watch(err => {
   if (err) return console.log('监听失败：', err)
   console.log('我看着呢，代码交给我构建，开始写代码吧~')
-  safeBuild({
-    minify: true,
-    sourcemap: false
-  })
+  devBuild()
 })
