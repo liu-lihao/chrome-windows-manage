@@ -40,12 +40,13 @@ export const removeTabs = (tabIds: number[]) => {
 /**
  * 获取所有常规窗口详情
  */
-export const getAllWindowsInfo = () => {
+export const getAllWindowsInfo = (config: Partial<Parameters<typeof chrome.windows.getAll>['0']> = {}) => {
   return new Promise<ChromeWindow[]>(resolve => {
     chrome.windows.getAll(
       {
         populate: true,
-        windowTypes: ['normal']
+        windowTypes: ['normal'],
+        ...config,
       },
       resolve
     )

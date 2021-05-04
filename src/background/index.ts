@@ -6,37 +6,51 @@ import {
 } from './utils'
 import { ChromeTab } from '../types'
 import { onMessage, clearLogRegularly, dateFormat } from '../utils'
-import { addGroup } from '../options/store'
-type AddGroupParam = Parameters<typeof addGroup>['0']
+import { useLastFocusWindowId, useWillSaveGroup } from './use'
 
-let lastFocusWindowId = chrome.windows.WINDOW_ID_NONE
-let willSaveGroup: AddGroupParam[] = []
+const optionsPageUrl = chrome.runtime.getURL('options/index.html')
 
-const addWillSaveGroup = (group: AddGroupParam | AddGroupParam[]) => {
-  willSaveGroup = willSaveGroup.concat(group)
+let openOptionTask: Function | null = null
+const realOpenOptionsPage = () => {
+  return new Promise((resolve) => {
+    openOptionTask = resolve
+    openOptionsPage()
+  })
 }
 
-chrome.windows.onFocusChanged.addListener(windowId => {
-  if (windowId > 0) {
-    lastFocusWindowId = windowId
-  }
-})
-
 clearLogRegularly()
-
 const { on } = onMessage()
+const lastFocusWindowIdRef = useLastFocusWindowId()
+const { willSaveGroupRef, addWillSaveGroup } = useWillSaveGroup()
+
+const isOptionsPage = (tab: ChromeTab) => {
+  return tab && tab.id && !(tab.url || '').includes(optionsPageUrl)
+}
 
 const filterOptionsPage = (tabs: ChromeTab[]) => {
-  return tabs.filter(
-    item => item && item.id && !(item.url || '').includes('chrome-extension://')
-  ) as (ChromeTab & { id: number })[]
+  return tabs.filter(isOptionsPage) as (ChromeTab & { id: number })[]
+}
+
+const findOptionsPage = (tabs: ChromeTab[]) => {
+  return tabs.find(isOptionsPage)
 }
 
 on('close-cur-tabs', async () => {
-  const tabs = await getWindowTabs()
-  await openOptionsPage()
+  let tabs = await getWindowTabs()
+  const optionsTab = findOptionsPage(tabs)
+  if (optionsTab && optionsTab.id) {
+    await removeTabs([optionsTab.id])
+  }
+  // await openOptionsPage()
+  await realOpenOptionsPage()
+  debugger
+  tabs = await getWindowTabs()
+
   const filtered = filterOptionsPage(tabs)
   if (!filtered.length) return
+
+  console.log('filtered', [...filtered.map(n => ({...n}))])
+
   await removeTabs(filtered.map(item => item.id))
   addWillSaveGroup({
     time: dateFormat(),
@@ -53,7 +67,7 @@ on('close-all-tabs', async () => {
   const windows = await getAllWindowsInfo()
   const removeTabIds = windows
     .map(item => {
-      const focused = item.id === lastFocusWindowId
+      const focused = item.id === lastFocusWindowIdRef.value
       const tabs = (focused
         ? filterOptionsPage(item.tabs || [])
         : item.tabs || []
@@ -81,11 +95,12 @@ on('get-all-windows-info', async () => {
 })
 
 on('get-last-focus-window-id', () => {
-  return lastFocusWindowId
+  return lastFocusWindowIdRef.value
 })
 
 on('get-will-save-groups', () => {
-  let t = willSaveGroup
-  willSaveGroup = []
+  let t = willSaveGroupRef.value
+  willSaveGroupRef.value = []
+  openOptionTask?.()
   return t
 })
