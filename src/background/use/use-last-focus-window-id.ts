@@ -1,8 +1,8 @@
-import { getAllWindowsInfo } from "../utils"
+import { getAllWindowsInfo } from '../utils'
 
 export const useLastFocusWindowId = () => {
   const idRef = {
-    value: chrome.windows.WINDOW_ID_NONE,
+    value: chrome.windows.WINDOW_ID_NONE
   }
 
   // 默认窗口 id

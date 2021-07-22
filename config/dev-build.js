@@ -9,8 +9,8 @@ const { safeBuild } = esBuildProject()
 
 const devBuild = () =>
   safeBuild({
-    minify: true,
-    sourcemap: false
+    minify: false,
+    sourcemap: true
   })
 
 // changeType, fullPath, currentStat, previousStat

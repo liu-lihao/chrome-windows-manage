@@ -12,7 +12,7 @@ const optionsPageUrl = chrome.runtime.getURL('options/index.html')
 
 let openOptionTask: Function | null = null
 const realOpenOptionsPage = () => {
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     openOptionTask = resolve
     openOptionsPage()
   })
@@ -49,7 +49,7 @@ on('close-cur-tabs', async () => {
   const filtered = filterOptionsPage(tabs)
   if (!filtered.length) return
 
-  console.log('filtered', [...filtered.map(n => ({...n}))])
+  console.log('filtered', [...filtered.map(n => ({ ...n }))])
 
   await removeTabs(filtered.map(item => item.id))
   addWillSaveGroup({

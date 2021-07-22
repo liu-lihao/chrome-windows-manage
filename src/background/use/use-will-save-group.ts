@@ -12,6 +12,6 @@ export const useWillSaveGroup = () => {
 
   return {
     willSaveGroupRef: groupRef,
-    addWillSaveGroup,
+    addWillSaveGroup
   }
 }
